@@ -77,6 +77,11 @@ This is the place for you to write reflections:
 ### Mandatory (Publisher) Reflections
 
 #### Reflection Publisher-1
+1. Menurutku di kasus BambangShop ini pake satu struct `Subscriber` aja udah cukup dan nggak butuh interface atau trait khusus. Soalnya, logika notifikasinya kan seragam ke semua subscriber (cuma ngirim HTTP POST request ke URL masing-masing). Beda cerita kalau misal cara ngabarin subscriber beda-beda (ada yang via email, ada yang via push notif). Karena semuanya sama, satu model struct aja udah cukup merepresentasikan.
+
+2. Walaupun URL/ID itu unik, pakai `DashMap` tetep jauh lebih butuh dan efisien dibanding `Vec`. Kalau kita pakai `Vec`, setiap kali kita mau delete atau ngecek URL subscriber, kita harus ngeloop satu-satu dari sini sampe dapet (O(n)). Nah, kalau pakai map/dictionary kayak `DashMap`, kita bisa langsung ambil, update, atau hapus datanya pakai key (URL) secara cepet banget (O(1)).
+
+3. Pola Singleton kan gunanya buat pastiin instance-nya cuma ada satu list. Tapi, karena aplikasi web kita dibikin pakai framework (Rocket) yang multi-threaded, bakal ada banyak request alias jalan bersamaan. Kalau tipe datanya bukan map yang thread-safe, misal ada yang daftar dan ngebatalin subscribe barengan, itu bisa bentrok (data race). Rust itu galak banget soal safety, makanya Singleton biasa (static variable) itu nggak bisa sembarangan diubah. Jadi kita tetep butuh `DashMap` biar aman waktu dibaca dan ditulis dari banyak thread sekaligus tanpa error.
 
 #### Reflection Publisher-2
 
