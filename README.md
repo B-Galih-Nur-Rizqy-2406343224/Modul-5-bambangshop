@@ -91,3 +91,10 @@ This is the place for you to write reflections:
 3. Bermanfaat banget buat ngetest kelancaran konektivitas API kita tanpa harus nungguin frontend alias UI-nya beres. Fitur yang paling kepake dan menarik buat tugas kelompok (group project) ke depannya itu kayaknya Collections (buat ngumpulin list API per fitur yang bisa di-share ke satu tim) sama Environment Variables (biar gampang kalau mau switch ngetest di localhost ke production server tanpa gonta-ganti link manual). Fitur Automated API Testing pake script di Postman juga keliatannya keren banget buat otomatisasi testing dan hemat waktu.
 
 #### Reflection Publisher-3
+1. Di tutorial ini, kita pake Push model. Soalnya, Publisher (BambangShop) secara aktif yang ngirim (nge-push) data notifikasi langsung ke URL masing-masing subscriber tiap kali ada event baru (misal produk dibuat/dihapus). Jadi kebalikannya dari subscriber yang bolak-balik ngecek ke sistem kita.
+
+2. Kalau misalnya kita pakai variasi sebaliknya, yaitu Pull model, ada trade-off-nya.
+Kelebihan (Pull): Kerjaan publisher jauh lebih ringan karena nggak perlu looping ngirim beban data gedenya ke ribuan subscriber satu-satu. Subscriber-lah yang inisiatif ngambil data pas butuh aja.
+Kekurangan (Pull): Sifatnya jadi kurang real-time (delay). Terus, subscriber harus bikin polling spesifik buat nanya "Eh ada update gak?", padahal sering kali jawabannya nggak ada, jadinya mubazir bandwidth jaringan sama CPU resource.
+
+3. Kalau implementasi fitur `notify` nggak pakai multi-threading dan langsung dibarengin di alur request utama, program bakal ngirim notif ke subscriber satu persatu secara synchronous nungguin sampai beres. Efeknya, pas ada user yang nambahin produk, tombol/aplikasinya bakal loading muter lama banget nunggu semua HTTP post notif ke ribuan subscriber selesai, padahal user-nya cuma butuh kepastian produknya udah sukses dibikin. Ini ngebikin performa API anjlok (bottleneck) gara-gara kelamaan antre.
